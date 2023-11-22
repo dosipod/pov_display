@@ -27,6 +27,7 @@
 #include "wled.h"
 #include "FX.h"
 #include "fcn_declare.h"
+#include "pov_image.h"
 
 #define IBN 5100
 
@@ -4273,6 +4274,16 @@ static const char _data_FX_MODE_WASHING_MACHINE[] PROGMEM = "Washing Machine@!,!
 
 
 /*
+  Display an Image on POV
+  By Arthur Suzuki
+*/
+uint16_t mode_pov_image(void) {
+    pov_image();
+    return FRAMETIME;
+}
+static const char _data_FX_MODE_POV_IMAGE[] PROGMEM = "POV Image@!;;;1s";
+
+/*
   Blends random colors across palette
   Modified, originally by Mark Kriegsman https://gist.github.com/kriegsman/1f7ccbbfa492a73c015e
 */
@@ -7792,7 +7803,7 @@ void WS2812FX::setupEffectData() {
   addEffect(FX_MODE_CHUNCHUN, &mode_chunchun, _data_FX_MODE_CHUNCHUN);
   addEffect(FX_MODE_DANCING_SHADOWS, &mode_dancing_shadows, _data_FX_MODE_DANCING_SHADOWS);
   addEffect(FX_MODE_WASHING_MACHINE, &mode_washing_machine, _data_FX_MODE_WASHING_MACHINE);
-
+  addEffect(FX_MODE_POV_IMAGE, &mode_pov_image, _data_FX_MODE_POV_IMAGE);
   addEffect(FX_MODE_BLENDS, &mode_blends, _data_FX_MODE_BLENDS);
   addEffect(FX_MODE_TV_SIMULATOR, &mode_tv_simulator, _data_FX_MODE_TV_SIMULATOR);
   addEffect(FX_MODE_DYNAMIC_SMOOTH, &mode_dynamic_smooth, _data_FX_MODE_DYNAMIC_SMOOTH);

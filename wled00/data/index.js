@@ -261,21 +261,25 @@ function onLoad()
 	updateTablinks(0);
 	pmtLS = localStorage.getItem('wledPmt');
 
-	// Load initial data
-	loadPalettes(()=>{
-		// fill effect extra data array
-		loadFXData(()=>{
-			// load and populate effects
-			loadFX(()=>{
-				setTimeout(()=>{ // ESP8266 can't handle quick requests
-					loadPalettesData(()=>{
-						requestJson();// will load presets and create WS
-					});
-				},100);
+        // Load initial data
+        loadPalettes(()=>{
+	    // fill effect extra data array
+	    loadFXData(()=>{
+		// load and populate effects
+		loadFX(()=>{
+		    // load available files for file selector
+		    loadFiles(()=>{
+			setTimeout(()=>{ // ESP8266 can't handle quick requests
+			    loadPalettesData(()=>{
+				requestJson();// will load presets and create WS
+			    });
 			});
+		    },100);
 		});
+	    });
 	});
-	resetUtil();
+
+        resetUtil();
 
 	d.addEventListener("visibilitychange", handleVisibilityChange, false);
 	//size();
@@ -533,6 +537,35 @@ function loadFXData(callback = null)
 		// add default value for Solid
 		fxdata.shift()
 		fxdata.unshift(";!;");
+	})
+	.catch((e)=>{
+		fxdata = [];
+		//setTimeout(loadFXData, 250); // retry
+		showToast(e, true);
+	})
+	.finally(()=>{
+		if (callback) callback();
+		updateUI();
+	});
+}
+
+function loadFiles(callback = null)
+{
+	fetch(getURL('/edit?list=/'), {
+		method: 'get'
+	})
+	.then((res)=>{
+		if (!res.ok) showErrorToast();
+		return res.json();
+	})
+	.then((json)=>{
+	    hiddenFiles = new Array('/cfg.json', '/presets.json');
+	    var html = "";
+	    for (const [key, file] of Object.entries(json))
+		if ( ! hiddenFiles.includes(file.name))
+		    html += '<option value="' + file.name + '">' + file.name.substr(1) + '</option>';
+
+	    gId('selectFile').innerHTML=html;
 	})
 	.catch((e)=>{
 		fxdata = [];
@@ -888,7 +921,8 @@ function populateEffects()
 					if (m.includes('1')) nm += "&#8942;"; // 1D effects
 					if (m.includes('2')) nm += "&#9638;"; // 2D effects
 					if (m.includes('v')) nm += "&#9834;"; // volume effects
-					if (m.includes('f')) nm += "&#9835;"; // frequency effects
+				        if (m.includes('f')) nm += "&#9835;"; // frequency effects
+				        if (m.includes('s')) nm += "&#128443;"; // fileselector effects
 				}
 			}
 			html += generateListItemHtml('fx',id,nm,'setFX','',fd);
@@ -1090,6 +1124,12 @@ function toggleBubble(e)
 {
 	var b = e.target.parentNode.parentNode.getElementsByTagName('output')[0];
 	b.classList.toggle('sliderbubbleshow');
+}
+
+//file selector
+function toggleFileSelector()
+{
+    d.getElementById('fileSelector').classList.toggle('hide');
 }
 
 // updates segment length upon input of segment values
@@ -1483,7 +1523,8 @@ function setEffectParameters(idx)
 	var slOnOff = (effectPars.length==0 || effectPars[0]=='')?[]:effectPars[0].split(",");
 	var coOnOff = (effectPars.length<2  || effectPars[1]=='')?[]:effectPars[1].split(",");
 	var paOnOff = (effectPars.length<3  || effectPars[2]=='')?[]:effectPars[2].split(",");
-
+        var flags = (effectPars.length<4 || effectPars[3]=='')?[]:effectPars[3];
+        if(flags.includes('s')) toggleFileSelector();
 	// set html slider items on/off
 	let nSliders = 5;
 	for (let i=0; i<nSliders; i++) {
@@ -2288,6 +2329,12 @@ function setCustom(i=1)
 	else if (i===2) obj.seg.c2 = val;
 	else            obj.seg.c1 = val;
 	requestJson(obj);
+}
+
+function setFile()
+{
+    var obj = {"seg":{"id":0,"fx":114,"f":gId('selectFile').value}};
+    requestJson(obj);
 }
 
 function setOption(i=1, v=false)

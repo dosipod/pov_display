@@ -251,6 +251,11 @@
 					<input type="checkbox" data-flt="&#9835;" onchange="filterFx(this)">
 					<span class="checkmark"></span>
 				</label>
+				<label id="filterFile" class="check fchkl">&#128443;
+				        <input type="checkbox" data-flt="&#128443;" onchange="filterFx(this)">
+					<span class="checkmark"></span>
+				</label>
+
 			</div>
 			<div id="slider0" class="slider">
 				<i class="icons slider-icon" onclick="tglFreeze()">&#xe325;</i>
@@ -269,6 +274,13 @@
 				</div>
 				<output class="sliderbubble"></output>
 				<span class="tooltiptext" id="sliderLabel1">Effect intensity</span>
+			</div>
+			<div id="fileSelector" class="slider hide">
+			        <i class="icons slider-icon">&#128443;</i>
+			        <div class="sliderwrap il">
+			                <select id="selectFile" onchange="setFile()" oninput="updateTrail(this)"></select>
+				</div>
+				<span class="tooltiptext" id="fileSelectorLabel">File selector</span>
 			</div>
 			<div id="slider2" class="slider hide">
 				<i class="icons slider-icon">&#xe410;</i>

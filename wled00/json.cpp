@@ -96,6 +96,7 @@ bool deserializeSegment(JsonObject elem, byte it, byte presetId)
   uint16_t of  = seg.offset;
   uint8_t  soundSim = elem["si"] | seg.soundSim;
   uint8_t  map1D2D  = elem["m12"] | seg.map1D2D;
+  String f = elem["f"] | seg.file;
 
   if ((spc>0 && spc!=seg.spacing) || seg.map1D2D!=map1D2D) seg.fill(BLACK); // clear spacing gaps
 
@@ -237,6 +238,7 @@ bool deserializeSegment(JsonObject elem, byte it, byte presetId)
   seg.check1 = elem["o1"] | seg.check1;
   seg.check2 = elem["o2"] | seg.check2;
   seg.check3 = elem["o3"] | seg.check3;
+  seg.file = elem["f"] | seg.file;
 
   JsonArray iarr = elem[F("i")]; //set individual LEDs
   if (!iarr.isNull()) {
@@ -541,6 +543,7 @@ void serializeSegment(JsonObject& root, Segment& seg, byte id, bool forPreset, b
   root["o1"]  = seg.check1;
   root["o2"]  = seg.check2;
   root["o3"]  = seg.check3;
+  root["f"]   = seg.file;
   root["si"]  = seg.soundSim;
   root["m12"] = seg.map1D2D;
 }
